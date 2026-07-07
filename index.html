@@ -1,0 +1,1362 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>로또 추첨기</title>
+  <style>
+    :root {
+      --primary: #76b900;
+      --primary-dark: #5a8d00;
+      --ink: #000000;
+      --body: #1a1a1a;
+      --canvas: #ffffff;
+      --surface-dark: #000000;
+      --surface-soft: #f7f7f7;
+      --surface-elevated: #1a1a1a;
+      --hairline: #cccccc;
+      --hairline-strong: #5e5e5e;
+      --mute: #757575;
+      --stone: #898989;
+      --ash: #a7a7a7;
+      --on-dark: #ffffff;
+      --on-dark-mute: rgba(255, 255, 255, 0.7);
+      --on-primary: #000000;
+      --radius-none: 0;
+      --radius-xs: 1px;
+      --radius-sm: 2px;
+      --spacing-xxs: 2px;
+      --spacing-xs: 4px;
+      --spacing-sm: 8px;
+      --spacing-md: 12px;
+      --spacing-lg: 16px;
+      --spacing-xl: 24px;
+      --spacing-xxl: 32px;
+      --spacing-section: 64px;
+      --content-width: 1280px;
+      --shadow-soft: 0 0 5px 0 rgba(0, 0, 0, 0.3);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background: var(--canvas);
+      color: var(--body);
+      font-family: NVIDIA-EMEA, Inter, Arial, Helvetica, sans-serif;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      overflow-x: hidden;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .utility-bar {
+      height: 32px;
+      background: var(--surface-dark);
+      color: var(--on-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    .utility-inner,
+    .primary-inner,
+    .breadcrumb-inner,
+    .subnav-inner,
+    .section-inner,
+    .footer-inner {
+      width: min(var(--content-width), calc(100vw - 48px));
+      margin: 0 auto;
+    }
+
+    .utility-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .utility-links {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      color: var(--on-dark-mute);
+    }
+
+    .primary-nav {
+      height: 64px;
+      background: var(--surface-dark);
+      color: var(--on-dark);
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid var(--hairline-strong);
+    }
+
+    .primary-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 16px;
+      letter-spacing: 0;
+    }
+
+    .brand-mark {
+      width: 12px;
+      height: 12px;
+      background: var(--primary);
+      display: inline-block;
+    }
+
+    .nav-row {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      font-size: 15px;
+      font-weight: 400;
+      color: var(--on-dark-mute);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .icon-chip {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: rgba(210, 210, 215, 0.64);
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .breadcrumb-bar {
+      height: 48px;
+      background: var(--surface-soft);
+      border-bottom: 1px solid var(--hairline);
+      display: flex;
+      align-items: center;
+      color: var(--body);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .breadcrumb-inner {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .breadcrumb-inner span {
+      color: var(--mute);
+      font-weight: 400;
+    }
+
+    .sub-nav-strip {
+      position: sticky;
+      top: 96px;
+      z-index: 10;
+      height: 56px;
+      background: rgba(247, 247, 247, 0.9);
+      border-bottom: 1px solid var(--hairline);
+      backdrop-filter: saturate(180%) blur(20px);
+      display: flex;
+      align-items: center;
+    }
+
+    .subnav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .subnav-title {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    .pill-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .pill-tab,
+    .pill-tab-active {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 36px;
+      padding: 10px 18px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--hairline);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.144px;
+      cursor: pointer;
+      transition: transform 160ms ease, background-color 160ms ease, opacity 160ms ease;
+    }
+
+    .pill-tab {
+      background: transparent;
+      color: var(--ink);
+    }
+
+    .pill-tab-active {
+      background: var(--ink);
+      color: var(--on-dark);
+      border-color: var(--ink);
+    }
+
+    .pill-tab:active,
+    .pill-tab-active:active,
+    button:active {
+      transform: scale(0.95);
+    }
+
+    button {
+      font: inherit;
+      border: 0;
+      cursor: pointer;
+    }
+
+    button:focus-visible,
+    .pill-tab:focus-visible,
+    .pill-tab-active:focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+    }
+
+    .button-primary {
+      background: var(--primary);
+      color: var(--on-primary);
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.25;
+      border-radius: var(--radius-sm);
+      padding: 11px 24px;
+      min-height: 44px;
+    }
+
+    .button-outline {
+      background: transparent;
+      color: var(--ink);
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.25;
+      border-radius: var(--radius-sm);
+      padding: 11px 13px;
+      min-height: 44px;
+      border: 1px solid var(--hairline);
+    }
+
+    .button-outline-on-dark {
+      background: transparent;
+      color: var(--on-dark);
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.25;
+      border-radius: var(--radius-sm);
+      padding: 11px 13px;
+      min-height: 44px;
+      border: 1px solid var(--on-dark);
+    }
+
+    .button-ghost-link {
+      background: transparent;
+      color: var(--primary);
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.25;
+      padding: 0;
+    }
+
+    .page {
+      background: var(--canvas);
+    }
+
+    .tile-dark {
+      background: var(--surface-dark);
+      color: var(--on-dark);
+    }
+
+    .tile-light {
+      background: var(--canvas);
+      color: var(--body);
+    }
+
+    .tile-soft {
+      background: var(--surface-soft);
+      color: var(--body);
+    }
+
+    .hero-card-dark,
+    .cta-strip-dark {
+      border-bottom: 1px solid var(--hairline-strong);
+    }
+
+    .hero-card-dark {
+      padding: 80px 0 72px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 32px;
+      align-items: center;
+    }
+
+    .hero-copy {
+      position: relative;
+      padding-left: 20px;
+    }
+
+    .corner-square {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: var(--primary);
+    }
+
+    .hero-copy .corner-square {
+      top: 0;
+      left: 0;
+    }
+
+    .eyebrow {
+      margin: 0 0 16px;
+      color: var(--primary);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(32px, 4.5vw, 48px);
+      font-weight: 700;
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+
+    .hero-text {
+      margin: 18px 0 0;
+      max-width: 40rem;
+      font-size: 16px;
+      line-height: 1.5;
+      color: var(--on-dark-mute);
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .hero-visual {
+      position: relative;
+      padding: 24px;
+      border: 1px solid var(--hairline-strong);
+      background: var(--surface-elevated);
+    }
+
+    .hero-visual .corner-square {
+      top: 0;
+      right: 0;
+    }
+
+    .visual-title {
+      margin: 0 0 18px;
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+
+    .visual-subtitle {
+      margin: 0 0 20px;
+      font-size: 15px;
+      line-height: 1.67;
+      color: var(--on-dark-mute);
+    }
+
+    .ball-display {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .ball {
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--hairline-strong);
+      border-radius: 50%;
+      background: var(--surface-dark);
+      color: var(--on-dark);
+      font-size: clamp(18px, 2vw, 22px);
+      font-weight: 700;
+      opacity: 0.4;
+      transform: scale(0.96);
+      transition: opacity 160ms ease, transform 160ms ease, background-color 160ms ease;
+    }
+
+    .ball.active {
+      opacity: 1;
+      transform: scale(1);
+      background: var(--primary);
+      color: var(--on-primary);
+      border-color: var(--primary);
+    }
+
+    .draw-grid {
+      padding: var(--spacing-section) 0;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .section-header h2 {
+      margin: 0;
+      font-size: 36px;
+      line-height: 1.25;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    .section-header p {
+      margin: 0;
+      max-width: 44rem;
+      font-size: 16px;
+      line-height: 1.5;
+      color: var(--mute);
+    }
+
+    .panel-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .product-card,
+    .resource-card,
+    .feature-card,
+    .callout-stat {
+      position: relative;
+      background: var(--canvas);
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-sm);
+      padding: 24px;
+    }
+
+    .product-card .corner-square,
+    .resource-card .corner-square,
+    .feature-card .corner-square,
+    .callout-stat .corner-square {
+      top: 0;
+      left: 0;
+    }
+
+    .product-card-title {
+      margin: 0 0 10px 20px;
+      font-size: 24px;
+      line-height: 1.25;
+      font-weight: 700;
+    }
+
+    .product-card-copy {
+      margin: 0 0 18px 20px;
+      font-size: 16px;
+      line-height: 1.5;
+      color: var(--body);
+    }
+
+    .result-board {
+      margin-top: 18px;
+      display: grid;
+      gap: 16px;
+      padding: 20px;
+      background: var(--surface-soft);
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-sm);
+    }
+
+    .result-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      min-height: 56px;
+    }
+
+    .chip {
+      width: 52px;
+      height: 52px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--primary);
+      color: var(--on-primary);
+      border: 1px solid var(--primary);
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .result-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      font-size: 14px;
+      line-height: 1.43;
+      color: var(--mute);
+    }
+
+    .result-meta strong {
+      color: var(--body);
+      font-weight: 700;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .callout-stat {
+      min-height: 140px;
+    }
+
+    .callout-stat .value {
+      display: block;
+      margin: 0 0 10px 20px;
+      font-size: 36px;
+      line-height: 1.25;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .callout-stat .label {
+      margin: 0 0 0 20px;
+      font-size: 16px;
+      line-height: 1.5;
+      color: var(--body);
+    }
+
+    .side-stack {
+      display: grid;
+      gap: 16px;
+    }
+
+    .history-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .history-item {
+      display: grid;
+      grid-template-columns: 72px 1fr auto;
+      gap: 16px;
+      align-items: center;
+      padding: 16px 18px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-sm);
+      background: var(--canvas);
+    }
+
+    .history-index {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 32px;
+      padding: 0 12px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-sm);
+      background: var(--surface-soft);
+      color: var(--body);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .history-balls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tiny-ball {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      border: 1px solid var(--hairline);
+      background: var(--canvas);
+      color: var(--ink);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .history-time {
+      font-size: 14px;
+      line-height: 1.43;
+      color: var(--mute);
+      white-space: nowrap;
+    }
+
+    .archive-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border: 1px solid var(--hairline-strong);
+      border-radius: var(--radius-sm);
+      color: var(--on-dark);
+      background: var(--surface-elevated);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .archive-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 24px;
+      margin-top: 28px;
+    }
+
+    .archive-card {
+      position: relative;
+      background: var(--canvas);
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-sm);
+      padding: 24px;
+      color: var(--body);
+    }
+
+    .archive-card .corner-square {
+      top: 0;
+      right: 0;
+    }
+
+    .archive-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: baseline;
+      margin-bottom: 16px;
+    }
+
+    .archive-round {
+      font-size: 17px;
+      font-weight: 700;
+      line-height: 1.47;
+    }
+
+    .archive-date {
+      font-size: 12px;
+      line-height: 1.25;
+      color: var(--mute);
+      white-space: nowrap;
+    }
+
+    .archive-balls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .archive-bonus {
+      font-size: 14px;
+      line-height: 1.43;
+      color: var(--mute);
+    }
+
+    .cta-strip-dark {
+      background: var(--surface-dark);
+      color: var(--on-dark);
+      padding: 64px 0;
+    }
+
+    .cta-strip {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 20px;
+      align-items: center;
+      padding: 32px;
+      border: 1px solid var(--hairline-strong);
+      background: var(--surface-elevated);
+      border-radius: var(--radius-sm);
+    }
+
+    .cta-strip .corner-square {
+      top: 0;
+      left: 0;
+    }
+
+    .cta-strip h3 {
+      margin: 0 0 8px 20px;
+      font-size: 24px;
+      line-height: 1.25;
+      font-weight: 700;
+    }
+
+    .cta-strip p {
+      margin: 0 0 0 20px;
+      font-size: 16px;
+      line-height: 1.5;
+      color: var(--on-dark-mute);
+    }
+
+    .footer-section {
+      background: var(--surface-dark);
+      color: var(--on-dark-mute);
+      padding: 64px 0;
+      border-top: 1px solid var(--hairline-strong);
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 24px;
+    }
+
+    .footer-col h4 {
+      margin: 0 0 14px;
+      color: var(--on-dark);
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.5;
+    }
+
+    .footer-col a {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--on-dark-mute);
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    .footer-fine {
+      margin-top: 28px;
+      padding-top: 18px;
+      border-top: 1px solid var(--hairline-strong);
+      font-size: 12px;
+      line-height: 1.25;
+      color: var(--mute);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 1024px) {
+      .archive-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .footer-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .panel-grid,
+      .hero-grid,
+      .cta-strip {
+        grid-template-columns: 1fr;
+      }
+
+      .subnav-inner {
+        gap: 12px;
+      }
+
+      .pill-tabs {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        max-width: 100%;
+        padding-bottom: 2px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .utility-inner,
+      .primary-inner,
+      .breadcrumb-inner,
+      .subnav-inner,
+      .section-inner,
+      .footer-inner {
+        width: min(100vw - 24px, var(--content-width));
+      }
+
+      .nav-row {
+        display: none;
+      }
+
+      .section-header {
+        flex-direction: column;
+        align-items: start;
+      }
+
+      .stat-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .archive-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 480px) {
+      .archive-grid,
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-card-dark {
+        padding: 64px 0 56px;
+      }
+
+      .section-header h2 {
+        font-size: 28px;
+      }
+
+      .hero-actions {
+        flex-direction: column;
+      }
+
+      .button-primary,
+      .button-outline,
+      .button-outline-on-dark {
+        width: 100%;
+      }
+
+      .history-item {
+        grid-template-columns: 1fr;
+        justify-items: start;
+      }
+
+      .history-time {
+        white-space: normal;
+      }
+    }
+  </style>
+</head>
+<body id="top">
+  <div class="utility-bar">
+    <div class="utility-inner">
+      <div>복권 추첨기</div>
+      <div class="utility-links">
+        <a href="#draw">로그인</a>
+        <a href="#archive">이용안내</a>
+      </div>
+    </div>
+  </div>
+
+  <header class="primary-nav">
+    <div class="primary-inner">
+      <div class="brand"><span class="brand-mark" aria-hidden="true"></span>로또 추첨기</div>
+      <nav class="nav-row" aria-label="주요 메뉴">
+        <a href="#draw">추첨하기</a>
+        <a href="#history">기록</a>
+        <a href="#archive">역대 번호</a>
+      </nav>
+      <div class="nav-actions">
+        <div class="icon-chip" aria-hidden="true">⌕</div>
+        <button class="button-primary" id="jumpDrawBtn">Get Started</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="breadcrumb-bar">
+    <div class="breadcrumb-inner">
+      <span>홈</span>
+      <span>/</span>
+      <span>로또6/45</span>
+      <span>/</span>
+      <span>추첨기</span>
+    </div>
+  </div>
+
+  <div class="sub-nav-strip">
+    <div class="subnav-inner">
+      <div class="subnav-title">로또6/45</div>
+      <div class="pill-tabs" role="tablist" aria-label="섹션 탭">
+        <button class="pill-tab-active" data-target="#draw">추첨하기</button>
+        <button class="pill-tab" data-target="#history">기록</button>
+        <button class="pill-tab" data-target="#archive">역대 번호</button>
+      </div>
+    </div>
+  </div>
+
+  <main class="page">
+    <section class="hero-card-dark tile-dark">
+      <div class="section-inner hero-grid">
+        <div class="hero-copy">
+          <span class="corner-square" aria-hidden="true"></span>
+          <p class="eyebrow">LOTTO DRAW SYSTEM</p>
+          <h1>로또 추첨기</h1>
+          <p class="hero-text">
+            1부터 45까지의 숫자 중 6개를 무작위로 뽑고, 동행복권 공식 회차의 역대 번호까지 함께 확인할 수 있습니다.
+            검은 캔버스와 초록 CTA, 그리고 각진 카드로 구성한 엔지니어링 스타일의 추첨기입니다.
+          </p>
+          <div class="hero-actions">
+            <button class="button-primary" id="drawBtn">번호 추첨하기</button>
+            <button class="button-outline-on-dark" id="clearBtn">기록 비우기</button>
+          </div>
+        </div>
+
+        <div class="hero-visual">
+          <span class="corner-square" aria-hidden="true"></span>
+          <p class="visual-title">Live Preview</p>
+          <p class="visual-subtitle">추첨하면 아래 공들이 채워지고, 최근 결과는 본문에서 바로 갱신됩니다.</p>
+          <div class="ball-display" aria-hidden="true">
+            <div class="ball">1</div>
+            <div class="ball">2</div>
+            <div class="ball">3</div>
+            <div class="ball">4</div>
+            <div class="ball">5</div>
+            <div class="ball">6</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="draw" class="draw-grid tile-light">
+      <div class="section-inner">
+        <div class="section-header">
+          <div>
+            <h2>이번 추첨 결과</h2>
+            <p>추첨 결과는 카드 안에서 정리되어 표시됩니다. 숫자는 중복 없이 6개가 선택됩니다.</p>
+          </div>
+          <button class="button-ghost-link" id="drawAgainBtn">다시 추첨</button>
+        </div>
+
+        <div class="panel-grid">
+          <article class="product-card">
+            <span class="corner-square" aria-hidden="true"></span>
+            <p class="product-card-title">중앙 결과 패널</p>
+            <p class="product-card-copy">가장 최근 추첨 번호를 먼저 보여줍니다. 결과는 자동으로 기록에 저장됩니다.</p>
+            <div class="result-board">
+              <div class="result-row" id="currentResult" aria-live="polite"></div>
+              <div class="result-meta">
+                <span>추첨 회차 <strong id="drawCount">0</strong></span>
+                <span>최종 업데이트 <strong id="lastDrawAt">-</strong></span>
+              </div>
+            </div>
+          </article>
+
+          <div class="side-stack">
+            <article class="callout-stat">
+              <span class="corner-square" aria-hidden="true"></span>
+              <span class="value" id="drawTotal">0</span>
+              <p class="label">누적 추첨 회차</p>
+            </article>
+            <article class="callout-stat">
+              <span class="corner-square" aria-hidden="true"></span>
+              <span class="value">6</span>
+              <p class="label">매회 뽑는 번호 수</p>
+            </article>
+            <article class="callout-stat">
+              <span class="corner-square" aria-hidden="true"></span>
+              <span class="value">45</span>
+              <p class="label">숫자 범위</p>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="history" class="tile-soft">
+      <div class="section-inner">
+        <div class="section-header">
+          <div>
+            <h2>추첨 기록</h2>
+            <p>최근 추첨 결과를 위에서 아래로 정리해서 쌓아둡니다.</p>
+          </div>
+        </div>
+        <div class="history-grid" id="historyList"></div>
+      </div>
+    </section>
+
+    <section class="cta-strip-dark">
+      <div class="section-inner cta-strip">
+        <span class="corner-square" aria-hidden="true"></span>
+        <div>
+          <h3>공식 역대 회차도 함께 보세요</h3>
+          <p>동행복권 공식 회차 데이터를 불러와 최근 당첨번호들을 카드로 보여줍니다.</p>
+        </div>
+        <button class="button-primary" data-target="#archive" id="archiveJumpBtn">역대 번호 보기</button>
+      </div>
+    </section>
+
+    <section id="archive" class="draw-grid tile-light">
+      <div class="section-inner">
+        <div class="section-header">
+          <div>
+            <h2>역대 로또 번호</h2>
+            <p>동행복권 공식 회차 기준으로 최근 당첨번호와 보너스 번호를 표시합니다.</p>
+          </div>
+          <div class="archive-status" id="archiveStatus">공식 회차 데이터를 불러오는 중입니다.</div>
+        </div>
+        <div class="archive-grid" id="archiveGrid"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer-section">
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <h4>로또 추첨기</h4>
+          <a href="#draw">추첨하기</a>
+          <a href="#history">기록</a>
+          <a href="#archive">역대 번호</a>
+        </div>
+        <div class="footer-col">
+          <h4>안내</h4>
+          <a href="#archive">공식 회차</a>
+          <a href="#draw">추첨 방식</a>
+          <a href="#history">누적 기록</a>
+        </div>
+        <div class="footer-col">
+          <h4>도구</h4>
+          <a href="#draw">다시 추첨</a>
+          <a href="#archive">최근 회차</a>
+          <a href="#top">맨 위로</a>
+        </div>
+        <div class="footer-col">
+          <h4>참고</h4>
+          <a href="#draw">오락용 페이지</a>
+          <a href="#archive">공식 데이터 연동</a>
+          <a href="#history">로컬 기록 표시</a>
+        </div>
+      </div>
+      <div class="footer-fine">참고: 이 페이지의 추첨은 오락용이며, 공식 회차 데이터는 동행복권 공개 결과를 기반으로 표시됩니다.</div>
+    </div>
+  </footer>
+
+  <script>
+    const drawBtn = document.getElementById("drawBtn");
+    const clearBtn = document.getElementById("clearBtn");
+    const drawAgainBtn = document.getElementById("drawAgainBtn");
+    const jumpDrawBtn = document.getElementById("jumpDrawBtn");
+    const archiveJumpBtn = document.getElementById("archiveJumpBtn");
+    const currentResult = document.getElementById("currentResult");
+    const historyList = document.getElementById("historyList");
+    const archiveGrid = document.getElementById("archiveGrid");
+    const archiveStatus = document.getElementById("archiveStatus");
+    const drawCount = document.getElementById("drawCount");
+    const drawTotal = document.getElementById("drawTotal");
+    const lastDrawAt = document.getElementById("lastDrawAt");
+    const resultBoard = document.querySelector(".result-board");
+    const stageBalls = Array.from(document.querySelectorAll(".ball"));
+    const tabs = Array.from(document.querySelectorAll(".pill-tab, .pill-tab-active"));
+    const LOTTO_API = "https://www.dhlottery.co.kr/common.do?method=getLottoNumber&drwNo=";
+    const ARCHIVE_COUNT = 12;
+
+    let history = [];
+    let drawNumber = 0;
+    let isDrawing = false;
+
+    function randomNumbers() {
+      const pool = Array.from({ length: 45 }, (_, i) => i + 1);
+      const picked = [];
+
+      while (picked.length < 6) {
+        const index = Math.floor(Math.random() * pool.length);
+        picked.push(pool.splice(index, 1)[0]);
+      }
+
+      return picked.sort((a, b) => a - b);
+    }
+
+    function formatTime(date) {
+      return new Intl.DateTimeFormat("ko-KR", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
+      }).format(date);
+    }
+
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      if (Number.isNaN(date.getTime())) return dateString;
+
+      return new Intl.DateTimeFormat("ko-KR", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+      }).format(date);
+    }
+
+    function renderChips(numbers, target) {
+      target.innerHTML = "";
+
+      numbers.forEach((number) => {
+        const chip = document.createElement("div");
+        chip.className = "chip";
+        chip.textContent = number;
+        target.appendChild(chip);
+      });
+    }
+
+    function renderHistory() {
+      historyList.innerHTML = "";
+
+      if (history.length === 0) {
+        const empty = document.createElement("article");
+        empty.className = "product-card";
+        empty.innerHTML = '<span class="corner-square" aria-hidden="true"></span><p class="product-card-title">아직 추첨 기록이 없습니다.</p><p class="product-card-copy">위의 초록 버튼을 눌러 첫 번호를 뽑아보세요.</p>';
+        historyList.appendChild(empty);
+        return;
+      }
+
+      history.forEach((entry, index) => {
+        const row = document.createElement("div");
+        row.className = "history-item";
+
+        const badge = document.createElement("div");
+        badge.className = "history-index";
+        badge.textContent = `${index + 1}회`;
+
+        const balls = document.createElement("div");
+        balls.className = "history-balls";
+
+        entry.numbers.forEach((number) => {
+          const ball = document.createElement("div");
+          ball.className = "tiny-ball";
+          ball.textContent = number;
+          balls.appendChild(ball);
+        });
+
+        const time = document.createElement("div");
+        time.className = "history-time";
+        time.textContent = entry.time;
+
+        row.appendChild(badge);
+        row.appendChild(balls);
+        row.appendChild(time);
+        historyList.appendChild(row);
+      });
+    }
+
+    function renderArchive(items) {
+      archiveGrid.innerHTML = "";
+
+      if (!items.length) {
+        const empty = document.createElement("article");
+        empty.className = "resource-card";
+        empty.innerHTML = '<span class="corner-square" aria-hidden="true"></span><p class="product-card-title">공식 회차 데이터를 불러오지 못했습니다.</p><p class="product-card-copy">네트워크 상태를 확인한 뒤 다시 시도해 주세요.</p>';
+        archiveGrid.appendChild(empty);
+        return;
+      }
+
+      items.forEach((item) => {
+        const card = document.createElement("article");
+        card.className = "resource-card";
+
+        const square = document.createElement("span");
+        square.className = "corner-square";
+        square.setAttribute("aria-hidden", "true");
+
+        const head = document.createElement("div");
+        head.className = "archive-head";
+
+        const round = document.createElement("div");
+        round.className = "archive-round";
+        round.textContent = `${item.drwNo}회`;
+
+        const date = document.createElement("div");
+        date.className = "archive-date";
+        date.textContent = formatDate(item.drwNoDate);
+
+        const balls = document.createElement("div");
+        balls.className = "archive-balls";
+        [item.drwtNo1, item.drwtNo2, item.drwtNo3, item.drwtNo4, item.drwtNo5, item.drwtNo6].forEach((number) => {
+          const ball = document.createElement("div");
+          ball.className = "tiny-ball";
+          ball.textContent = number;
+          balls.appendChild(ball);
+        });
+
+        const bonus = document.createElement("div");
+        bonus.className = "archive-bonus";
+        bonus.textContent = `보너스 ${item.bnusNo}`;
+
+        head.appendChild(round);
+        head.appendChild(date);
+        card.appendChild(square);
+        card.appendChild(head);
+        card.appendChild(balls);
+        card.appendChild(bonus);
+        archiveGrid.appendChild(card);
+      });
+    }
+
+    async function fetchOfficialDraw(drwNo) {
+      try {
+        const response = await fetch(`${LOTTO_API}${drwNo}`);
+        if (!response.ok) return null;
+
+        const data = await response.json();
+        if (!data || data.returnValue !== "success") return null;
+        return data;
+      } catch (error) {
+        return null;
+      }
+    }
+
+    async function findLatestDrawNumber() {
+      let low = 1;
+      let high = 3000;
+
+      while (low < high) {
+        const mid = Math.ceil((low + high + 1) / 2);
+        const data = await fetchOfficialDraw(mid);
+        if (data) {
+          low = mid;
+        } else {
+          high = mid - 1;
+        }
+      }
+
+      return low;
+    }
+
+    async function loadOfficialArchive() {
+      archiveStatus.textContent = "공식 회차 데이터를 찾는 중입니다.";
+
+      try {
+        const latest = await findLatestDrawNumber();
+        const count = Math.min(ARCHIVE_COUNT, latest);
+        const requests = [];
+
+        for (let round = latest; round > latest - count; round -= 1) {
+          requests.push(fetchOfficialDraw(round));
+        }
+
+        const archive = (await Promise.all(requests)).filter(Boolean);
+
+        if (!archive.length) {
+          archiveStatus.textContent = "공식 회차 데이터를 불러오지 못했습니다.";
+          renderArchive([]);
+          return;
+        }
+
+        renderArchive(archive);
+        archiveStatus.textContent = `공식 최신 회차 ${latest}회 기준 최근 ${archive.length}개 결과를 표시합니다.`;
+      } catch (error) {
+        archiveStatus.textContent = "공식 회차 데이터를 불러오지 못했습니다.";
+        renderArchive([]);
+      }
+    }
+
+    async function drawLottery() {
+      if (isDrawing) return;
+
+      isDrawing = true;
+      drawBtn.disabled = true;
+      clearBtn.disabled = true;
+      drawAgainBtn.disabled = true;
+      resultBoard.classList.add("drawing");
+
+      const steps = 6;
+      let finalNumbers = [];
+
+      for (let i = 0; i < steps; i += 1) {
+        finalNumbers = randomNumbers();
+        renderChips(finalNumbers, currentResult);
+        stageBalls.forEach((ball, idx) => {
+          ball.classList.toggle("active", idx <= i);
+        });
+        await new Promise((resolve) => setTimeout(resolve, 140));
+      }
+
+      const now = new Date();
+      drawNumber += 1;
+      history.unshift({
+        numbers: finalNumbers,
+        time: formatTime(now)
+      });
+
+      drawCount.textContent = String(drawNumber);
+      drawTotal.textContent = String(drawNumber);
+      lastDrawAt.textContent = formatTime(now);
+      renderChips(finalNumbers, currentResult);
+      renderHistory();
+
+      resultBoard.classList.remove("drawing");
+      stageBalls.forEach((ball) => ball.classList.remove("active"));
+      drawBtn.disabled = false;
+      clearBtn.disabled = false;
+      drawAgainBtn.disabled = false;
+      isDrawing = false;
+    }
+
+    function clearHistory() {
+      history = [];
+      drawNumber = 0;
+      drawCount.textContent = "0";
+      drawTotal.textContent = "0";
+      lastDrawAt.textContent = "-";
+      currentResult.innerHTML = "";
+      renderHistory();
+    }
+
+    function scrollToTarget(target) {
+      const element = document.querySelector(target);
+      if (element) element.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    drawBtn.addEventListener("click", drawLottery);
+    clearBtn.addEventListener("click", clearHistory);
+    drawAgainBtn.addEventListener("click", drawLottery);
+    jumpDrawBtn.addEventListener("click", () => scrollToTarget("#draw"));
+    archiveJumpBtn.addEventListener("click", () => scrollToTarget("#archive"));
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => scrollToTarget(tab.dataset.target));
+    });
+
+    renderHistory();
+    loadOfficialArchive();
+  </script>
+</body>
+</html>
