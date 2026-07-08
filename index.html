@@ -135,7 +135,8 @@
     .draw-fx-rays,
     .draw-fx-particles,
     .draw-fx-orbits,
-    .draw-fx-shocklines {
+    .draw-fx-shocklines,
+    .draw-fx-ribbons {
       position: absolute;
       inset: 0;
     }
@@ -209,6 +210,20 @@
       animation-delay: 260ms;
     }
 
+    .draw-fx-ring.ring-d {
+      width: 154vmax;
+      height: 154vmax;
+      border-color: rgba(255, 255, 255, 0.12);
+      animation-delay: 420ms;
+    }
+
+    .draw-fx-ring.ring-e {
+      width: 22vmax;
+      height: 22vmax;
+      border-color: rgba(255, 111, 61, 0.7);
+      animation-delay: 520ms;
+    }
+
     .draw-fx-rays {
       opacity: 0;
       animation: megaRays 1250ms ease-out forwards;
@@ -251,44 +266,74 @@
       opacity: 0;
     }
 
+    .draw-fx-ribbons::before,
+    .draw-fx-ribbons::after {
+      content: "";
+      position: absolute;
+      left: -10vw;
+      right: -10vw;
+      top: 50%;
+      height: 26px;
+      background:
+        linear-gradient(90deg,
+          rgba(255, 255, 255, 0) 0%,
+          rgba(255, 255, 255, 0.55) 18%,
+          rgba(246, 229, 0, 0.78) 30%,
+          rgba(218, 41, 28, 0.82) 48%,
+          rgba(255, 255, 255, 0.76) 64%,
+          rgba(255, 255, 255, 0) 100%);
+      filter: blur(2px);
+      opacity: 0;
+      transform: translateY(-50%) rotate(-8deg) scaleX(0.2);
+      animation: ribbonBurst 1500ms cubic-bezier(0.08, 0.85, 0.12, 1) forwards;
+      mix-blend-mode: screen;
+    }
+
+    .draw-fx-ribbons::after {
+      top: 58%;
+      height: 18px;
+      transform: translateY(-50%) rotate(9deg) scaleX(0.15);
+      animation-delay: 180ms;
+    }
+
     .draw-fx-particles {
-      filter: drop-shadow(0 0 14px currentColor);
+      filter: drop-shadow(0 0 18px currentColor) drop-shadow(0 0 30px currentColor);
     }
 
     .draw-fx-particle {
       position: absolute;
       left: 50%;
       top: 50%;
-      width: 12px;
-      height: 12px;
+      width: 14px;
+      height: 14px;
       border-radius: 999px;
       opacity: 0;
       transform: translate(-50%, -50%);
-      animation: megaParticle 1450ms cubic-bezier(0.08, 0.88, 0.14, 1) forwards;
-      box-shadow: 0 0 18px currentColor;
+      animation: megaParticle 1650ms cubic-bezier(0.08, 0.88, 0.14, 1) forwards;
+      box-shadow: 0 0 26px currentColor;
     }
 
     .draw-fx-particle.wide {
-      width: 28px;
-      height: 7px;
+      width: 44px;
+      height: 9px;
       border-radius: 999px;
     }
 
     .draw-fx-particle.square {
-      width: 14px;
-      height: 14px;
+      width: 18px;
+      height: 18px;
       border-radius: 2px;
     }
 
     .draw-fx-particle.spark {
-      width: 4px;
-      height: 22px;
+      width: 5px;
+      height: 32px;
       border-radius: 999px;
     }
 
     .draw-fx-particle.glow {
-      width: 18px;
-      height: 18px;
+      width: 24px;
+      height: 24px;
       border-radius: 50%;
       filter: blur(1px);
     }
@@ -1134,6 +1179,13 @@
       12% { opacity: 1; }
       48% { opacity: 0.75; }
       100% { opacity: 0; transform: scale(1.12); }
+    }
+
+    @keyframes ribbonBurst {
+      0% { opacity: 0; transform: translateY(-50%) rotate(-8deg) scaleX(0.12); }
+      14% { opacity: 1; }
+      50% { opacity: 0.88; }
+      100% { opacity: 0; transform: translateY(-50%) rotate(-8deg) scaleX(1.15); }
     }
 
     @keyframes confettiFly {
@@ -2030,6 +2082,7 @@
           <div class="draw-fx-rings"></div>
           <div class="draw-fx-rays"></div>
           <div class="draw-fx-shocklines"></div>
+          <div class="draw-fx-ribbons"></div>
           <div class="draw-fx-orbits"></div>
           <div class="draw-fx-particles"></div>
         `;
@@ -2046,14 +2099,15 @@
       const rings = layer.querySelector(".draw-fx-rings");
       const rays = layer.querySelector(".draw-fx-rays");
       const shocklines = layer.querySelector(".draw-fx-shocklines");
+      const ribbons = layer.querySelector(".draw-fx-ribbons");
       const orbits = layer.querySelector(".draw-fx-orbits");
 
       document.body.classList.add("is-drawing-frenzy");
       resultBoard.classList.add("is-frenzy");
 
-      const palette = ["#ffffff", "#f6e500", "#da291c", "#ff6b3d", "#ffd166", "#ff9f1c"];
-      const shapeClasses = ["", "wide", "square", "spark", "glow", "wide", "square"];
-      const particleCount = mode === "start" ? 36 : 180;
+      const palette = ["#ffffff", "#f6e500", "#da291c", "#ff6b3d", "#ffd166", "#ff9f1c", "#7df9ff", "#ff4fd8"];
+      const shapeClasses = ["", "wide", "square", "spark", "glow", "wide", "square", "spark"];
+      const particleCount = mode === "start" ? 48 : 320;
 
       particles.innerHTML = "";
       orbits.innerHTML = "";
@@ -2061,6 +2115,7 @@
       void rings.offsetWidth;
       void rays.offsetWidth;
       void shocklines.offsetWidth;
+      void ribbons.offsetWidth;
       void orbits.offsetWidth;
 
       for (let i = 0; i < particleCount; i += 1) {
@@ -2090,7 +2145,7 @@
         const orbit = document.createElement("span");
         const size = mode === "start"
           ? 32 + i * 18
-          : 20 + i * 26;
+          : 24 + i * 32;
         const lineDelay = `${i * 70}ms`;
         const hue = palette[i % palette.length];
         orbit.className = "draw-fx-ring";
@@ -2101,11 +2156,40 @@
         orbits.appendChild(orbit);
       }
 
+      const ribbonsList = mode === "start"
+        ? [
+            { top: "46%", rotate: "-14deg", delay: "0ms" },
+            { top: "56%", rotate: "12deg", delay: "80ms" }
+          ]
+        : [
+            { top: "34%", rotate: "-18deg", delay: "0ms" },
+            { top: "44%", rotate: "15deg", delay: "120ms" },
+            { top: "60%", rotate: "-10deg", delay: "240ms" }
+          ];
+
+      ribbons.innerHTML = "";
+      ribbonsList.forEach((item) => {
+        const ribbon = document.createElement("span");
+        ribbon.style.position = "absolute";
+        ribbon.style.left = "-12vw";
+        ribbon.style.right = "-12vw";
+        ribbon.style.top = item.top;
+        ribbon.style.height = "24px";
+        ribbon.style.opacity = "0";
+        ribbon.style.transform = `translateY(-50%) rotate(${item.rotate}) scaleX(0.12)`;
+        ribbon.style.animation = `ribbonBurst ${mode === "start" ? 1200 : 1500}ms cubic-bezier(0.08, 0.85, 0.12, 1) forwards`;
+        ribbon.style.animationDelay = item.delay;
+        ribbon.style.background = "linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.7) 18%, rgba(246,229,0,0.92) 33%, rgba(218,41,28,0.92) 52%, rgba(255,255,255,0.72) 70%, rgba(255,255,255,0) 100%)";
+        ribbon.style.filter = "blur(2px)";
+        ribbon.style.mixBlendMode = "screen";
+        ribbons.appendChild(ribbon);
+      });
+
       window.setTimeout(() => {
         document.body.classList.remove("is-drawing-frenzy");
         resultBoard.classList.remove("is-frenzy");
         layer.remove();
-      }, mode === "start" ? 1000 : 1800);
+      }, mode === "start" ? 1200 : 2400);
     }
 
     function launchConfetti() {
@@ -2196,6 +2280,10 @@
       flashResultBoard();
       launchConfetti();
       triggerDrawFrenzy("end");
+      window.setTimeout(() => launchConfetti(), 120);
+      window.setTimeout(() => triggerDrawFrenzy("end"), 220);
+      window.setTimeout(() => launchConfetti(), 360);
+      window.setTimeout(() => triggerDrawFrenzy("end"), 520);
 
       if (supabase) {
         setDbStatus("Supabase에 추첨 결과를 저장하는 중입니다...");
