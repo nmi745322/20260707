@@ -133,17 +133,20 @@
     .draw-fx-flash,
     .draw-fx-rings,
     .draw-fx-rays,
-    .draw-fx-particles {
+    .draw-fx-particles,
+    .draw-fx-orbits,
+    .draw-fx-shocklines {
       position: absolute;
       inset: 0;
     }
 
     .draw-fx-flash {
       background:
-        radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.28) 16%, rgba(255, 255, 255, 0) 42%),
-        radial-gradient(circle at 50% 50%, rgba(246, 229, 0, 0.85), rgba(246, 229, 0, 0) 48%);
+        radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.36) 12%, rgba(255, 255, 255, 0) 26%),
+        radial-gradient(circle at 50% 50%, rgba(246, 229, 0, 0.98), rgba(246, 229, 0, 0.32) 18%, rgba(246, 229, 0, 0) 54%),
+        radial-gradient(circle at 50% 50%, rgba(218, 41, 28, 0.44), rgba(218, 41, 28, 0) 74%);
       opacity: 0;
-      animation: megaFlash 900ms ease-out forwards;
+      animation: megaFlash 1200ms ease-out forwards;
       mix-blend-mode: screen;
     }
 
@@ -153,79 +156,139 @@
       position: absolute;
       left: 50%;
       top: 50%;
-      width: 120vmax;
-      height: 120vmax;
+      width: 130vmax;
+      height: 130vmax;
       border-radius: 50%;
-      border: 2px solid rgba(255, 255, 255, 0.36);
-      transform: translate(-50%, -50%) scale(0.2);
+      border: 2px solid rgba(255, 255, 255, 0.5);
+      transform: translate(-50%, -50%) scale(0.1);
       opacity: 0;
-      animation: megaRing 1200ms ease-out forwards;
+      animation: megaRing 1400ms ease-out forwards;
       box-shadow:
-        0 0 40px rgba(218, 41, 28, 0.22),
+        0 0 40px rgba(218, 41, 28, 0.32),
+        0 0 120px rgba(246, 229, 0, 0.12),
         inset 0 0 36px rgba(255, 255, 255, 0.08);
     }
 
     .draw-fx-rings::after {
-      width: 86vmax;
-      height: 86vmax;
-      border-color: rgba(246, 229, 0, 0.4);
-      animation-delay: 110ms;
+      width: 92vmax;
+      height: 92vmax;
+      border-color: rgba(246, 229, 0, 0.56);
+      animation-delay: 140ms;
+    }
+
+    .draw-fx-ring {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      border-radius: 50%;
+      transform: translate(-50%, -50%) scale(0.08);
+      opacity: 0;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      animation: megaRing 1500ms ease-out forwards;
+      mix-blend-mode: screen;
+    }
+
+    .draw-fx-ring.ring-a {
+      width: 112vmax;
+      height: 112vmax;
+      border-color: rgba(255, 255, 255, 0.22);
+      animation-delay: 70ms;
+    }
+
+    .draw-fx-ring.ring-b {
+      width: 74vmax;
+      height: 74vmax;
+      border-color: rgba(218, 41, 28, 0.36);
+      animation-delay: 180ms;
+    }
+
+    .draw-fx-ring.ring-c {
+      width: 46vmax;
+      height: 46vmax;
+      border-color: rgba(246, 229, 0, 0.6);
+      animation-delay: 260ms;
     }
 
     .draw-fx-rays {
       opacity: 0;
-      animation: megaRays 1100ms ease-out forwards;
+      animation: megaRays 1250ms ease-out forwards;
       background:
         conic-gradient(from 0deg at 50% 50%,
           rgba(255, 255, 255, 0) 0deg,
-          rgba(255, 255, 255, 0.14) 8deg,
-          rgba(255, 255, 255, 0) 16deg,
-          rgba(218, 41, 28, 0.18) 24deg,
+          rgba(255, 255, 255, 0.26) 5deg,
+          rgba(255, 255, 255, 0) 10deg,
+          rgba(218, 41, 28, 0.26) 15deg,
+          rgba(255, 255, 255, 0) 20deg,
+          rgba(246, 229, 0, 0.26) 26deg,
           rgba(255, 255, 255, 0) 32deg,
-          rgba(246, 229, 0, 0.12) 40deg,
-          rgba(255, 255, 255, 0) 48deg,
+          rgba(255, 255, 255, 0.16) 38deg,
+          rgba(255, 255, 255, 0) 44deg,
           rgba(255, 255, 255, 0) 360deg);
       transform-origin: center;
-      filter: blur(0.5px);
+      filter: blur(0.3px);
       mix-blend-mode: screen;
     }
 
+    .draw-fx-shocklines::before,
+    .draw-fx-shocklines::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(0deg, transparent 48%, rgba(255, 255, 255, 0.5) 50%, transparent 52%),
+        linear-gradient(90deg, transparent 48%, rgba(255, 255, 255, 0.45) 50%, transparent 52%),
+        linear-gradient(45deg, transparent 49%, rgba(218, 41, 28, 0.3) 50%, transparent 51%),
+        linear-gradient(135deg, transparent 49%, rgba(246, 229, 0, 0.3) 50%, transparent 51%);
+      opacity: 0;
+      transform: scale(0.7);
+      animation: shockLines 1000ms ease-out forwards;
+      mix-blend-mode: screen;
+    }
+
+    .draw-fx-shocklines::after {
+      animation-delay: 140ms;
+      transform: scale(1.02);
+      opacity: 0;
+    }
+
     .draw-fx-particles {
-      filter: drop-shadow(0 0 10px currentColor);
+      filter: drop-shadow(0 0 14px currentColor);
     }
 
     .draw-fx-particle {
       position: absolute;
       left: 50%;
       top: 50%;
-      width: 10px;
-      height: 10px;
+      width: 12px;
+      height: 12px;
       border-radius: 999px;
       opacity: 0;
       transform: translate(-50%, -50%);
-      animation: megaParticle 1100ms cubic-bezier(0.1, 0.72, 0.18, 1) forwards;
-      box-shadow: 0 0 16px currentColor;
+      animation: megaParticle 1450ms cubic-bezier(0.08, 0.88, 0.14, 1) forwards;
+      box-shadow: 0 0 18px currentColor;
     }
 
     .draw-fx-particle.wide {
-      width: 18px;
-      height: 6px;
+      width: 28px;
+      height: 7px;
       border-radius: 999px;
     }
 
     .draw-fx-particle.square {
+      width: 14px;
+      height: 14px;
       border-radius: 2px;
     }
 
     .draw-fx-particle.spark {
-      width: 5px;
-      height: 18px;
+      width: 4px;
+      height: 22px;
       border-radius: 999px;
     }
 
     .draw-fx-particle.glow {
-      width: 14px;
-      height: 14px;
+      width: 18px;
+      height: 18px;
       border-radius: 50%;
       filter: blur(1px);
     }
@@ -893,7 +956,7 @@
     }
 
     .result-board.is-frenzy {
-      animation: boardRattle 160ms linear infinite;
+      animation: boardRattle 120ms linear infinite;
       box-shadow:
         0 0 0 1px rgba(255, 255, 255, 0.12),
         0 0 52px rgba(218, 41, 28, 0.22),
@@ -1029,29 +1092,32 @@
 
     @keyframes megaFlash {
       0% { opacity: 0; transform: scale(0.65); }
-      12% { opacity: 1; }
-      45% { opacity: 0.72; transform: scale(1.04); }
+      10% { opacity: 1; }
+      28% { opacity: 0.9; transform: scale(1.06); }
+      55% { opacity: 0.5; transform: scale(1.16); }
       100% { opacity: 0; transform: scale(1.14); }
     }
 
     @keyframes megaRing {
       0% { opacity: 0; transform: translate(-50%, -50%) scale(0.18); }
-      18% { opacity: 0.95; }
+      16% { opacity: 0.98; }
+      70% { opacity: 0.42; }
       100% { opacity: 0; transform: translate(-50%, -50%) scale(1.02); }
     }
 
     @keyframes megaRays {
       0% { opacity: 0; transform: rotate(-25deg) scale(0.62); }
-      20% { opacity: 0.8; }
-      100% { opacity: 0; transform: rotate(220deg) scale(1.12); }
+      18% { opacity: 1; }
+      52% { opacity: 0.88; }
+      100% { opacity: 0; transform: rotate(260deg) scale(1.16); }
     }
 
     @keyframes megaParticle {
       0% {
         opacity: 0;
-        transform: translate(-50%, -50%) scale(0.4) rotate(0deg);
+        transform: translate(-50%, -50%) scale(0.18) rotate(0deg);
       }
-      8% {
+      6% {
         opacity: 1;
       }
       100% {
@@ -1061,6 +1127,13 @@
           scale(1.1)
           rotate(var(--r));
       }
+    }
+
+    @keyframes shockLines {
+      0% { opacity: 0; transform: scale(0.55); }
+      12% { opacity: 1; }
+      48% { opacity: 0.75; }
+      100% { opacity: 0; transform: scale(1.12); }
     }
 
     @keyframes confettiFly {
@@ -1956,6 +2029,8 @@
           <div class="draw-fx-flash"></div>
           <div class="draw-fx-rings"></div>
           <div class="draw-fx-rays"></div>
+          <div class="draw-fx-shocklines"></div>
+          <div class="draw-fx-orbits"></div>
           <div class="draw-fx-particles"></div>
         `;
         document.body.appendChild(layer);
@@ -1970,29 +2045,34 @@
       const flash = layer.querySelector(".draw-fx-flash");
       const rings = layer.querySelector(".draw-fx-rings");
       const rays = layer.querySelector(".draw-fx-rays");
+      const shocklines = layer.querySelector(".draw-fx-shocklines");
+      const orbits = layer.querySelector(".draw-fx-orbits");
 
       document.body.classList.add("is-drawing-frenzy");
       resultBoard.classList.add("is-frenzy");
 
-      const palette = ["#ffffff", "#f6e500", "#da291c", "#ff6b3d", "#ffd166"];
-      const shapeClasses = ["", "wide", "square", "spark", "glow"];
-      const particleCount = mode === "start" ? 24 : 96;
+      const palette = ["#ffffff", "#f6e500", "#da291c", "#ff6b3d", "#ffd166", "#ff9f1c"];
+      const shapeClasses = ["", "wide", "square", "spark", "glow", "wide", "square"];
+      const particleCount = mode === "start" ? 36 : 180;
 
       particles.innerHTML = "";
+      orbits.innerHTML = "";
       void flash.offsetWidth;
       void rings.offsetWidth;
       void rays.offsetWidth;
+      void shocklines.offsetWidth;
+      void orbits.offsetWidth;
 
       for (let i = 0; i < particleCount; i += 1) {
         const particle = document.createElement("span");
         const angle = (Math.PI * 2 * i) / particleCount + Math.random() * 0.35;
         const distance = mode === "start"
-          ? 120 + Math.random() * 180
-          : 260 + Math.random() * 520;
-        const wobbleX = Math.cos(angle) * distance + (Math.random() - 0.5) * 90;
-        const wobbleY = Math.sin(angle) * distance + (Math.random() - 0.5) * 90;
-        const rotation = `${Math.round(360 + Math.random() * 1080)}deg`;
-        const delay = `${Math.random() * (mode === "start" ? 90 : 180)}ms`;
+          ? 180 + Math.random() * 240
+          : 420 + Math.random() * 820;
+        const wobbleX = Math.cos(angle) * distance + (Math.random() - 0.5) * 180;
+        const wobbleY = Math.sin(angle) * distance + (Math.random() - 0.5) * 180;
+        const rotation = `${Math.round(480 + Math.random() * 1620)}deg`;
+        const delay = `${Math.random() * (mode === "start" ? 120 : 240)}ms`;
         const color = palette[i % palette.length];
 
         particle.className = `draw-fx-particle ${shapeClasses[i % shapeClasses.length]}`.trim();
@@ -2005,11 +2085,27 @@
         particles.appendChild(particle);
       }
 
+      const orbitCount = mode === "start" ? 4 : 10;
+      for (let i = 0; i < orbitCount; i += 1) {
+        const orbit = document.createElement("span");
+        const size = mode === "start"
+          ? 32 + i * 18
+          : 20 + i * 26;
+        const lineDelay = `${i * 70}ms`;
+        const hue = palette[i % palette.length];
+        orbit.className = "draw-fx-ring";
+        orbit.style.width = `${size}vmax`;
+        orbit.style.height = `${size}vmax`;
+        orbit.style.borderColor = hue;
+        orbit.style.animationDelay = lineDelay;
+        orbits.appendChild(orbit);
+      }
+
       window.setTimeout(() => {
         document.body.classList.remove("is-drawing-frenzy");
         resultBoard.classList.remove("is-frenzy");
         layer.remove();
-      }, mode === "start" ? 900 : 1300);
+      }, mode === "start" ? 1000 : 1800);
     }
 
     function launchConfetti() {
