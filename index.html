@@ -1021,59 +1021,80 @@
       position: absolute;
       top: 50%;
       left: 50%;
-      width: 12px;
-      height: 20px;
+      width: 16px;
+      height: 26px;
       border-radius: 999px;
       opacity: 0;
       transform: translate(-50%, -50%) rotate(0deg);
-      animation: confettiFly 1600ms cubic-bezier(0.08, 0.82, 0.15, 1) forwards;
-      box-shadow: 0 0 18px currentColor, 0 0 32px currentColor;
-      filter: saturate(1.4);
+      animation: confettiFly 2100ms cubic-bezier(0.08, 0.82, 0.15, 1) forwards;
+      box-shadow: 0 0 22px currentColor, 0 0 48px currentColor;
+      filter: saturate(1.6) brightness(1.12);
     }
 
     .confetti-piece.square {
-      width: 18px;
-      height: 18px;
+      width: 24px;
+      height: 24px;
       border-radius: 2px;
     }
 
     .confetti-piece.spark {
       width: 6px;
-      height: 28px;
+      height: 38px;
       border-radius: 999px;
       transform-origin: center top;
     }
 
     .confetti-piece.big {
-      width: 30px;
-      height: 16px;
+      width: 42px;
+      height: 20px;
       border-radius: 999px;
     }
 
     .confetti-piece.dot {
-      width: 14px;
-      height: 14px;
+      width: 18px;
+      height: 18px;
       border-radius: 50%;
     }
 
     .confetti-piece.star {
-      width: 18px;
-      height: 18px;
+      width: 24px;
+      height: 24px;
       clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
       border-radius: 0;
     }
 
     .confetti-piece.ribbon {
-      width: 40px;
-      height: 10px;
+      width: 56px;
+      height: 12px;
       border-radius: 999px;
     }
 
     .confetti-piece.trail {
-      width: 5px;
-      height: 46px;
+      width: 6px;
+      height: 60px;
       border-radius: 999px;
       filter: blur(0.5px);
+    }
+
+    .confetti-piece.giant {
+      width: 64px;
+      height: 28px;
+      border-radius: 999px;
+      box-shadow: 0 0 28px currentColor, 0 0 64px currentColor;
+    }
+
+    .confetti-piece.hexa {
+      width: 28px;
+      height: 28px;
+      clip-path: polygon(25% 6%, 75% 6%, 100% 50%, 75% 94%, 25% 94%, 0% 50%);
+      border-radius: 0;
+    }
+
+    .confetti-piece.wing {
+      width: 54px;
+      height: 18px;
+      clip-path: polygon(0 50%, 22% 0, 100% 0, 78% 50%, 100% 100%, 22% 100%);
+      border-radius: 0;
     }
 
     @keyframes sweep {
@@ -2247,13 +2268,27 @@
         "#22c55e",
         "#f97316",
         "#38bdf8",
-        "#fb7185"
+        "#fb7185",
+        "#f43f5e",
+        "#c084fc",
+        "#2dd4bf",
+        "#facc15",
+        "#fb923c",
+        "#a3e635",
+        "#ffffff",
+        "#ff3d00",
+        "#00e5ff",
+        "#ffe066",
+        "#ff00c8",
+        "#00ff88"
       ];
-      const shapes = ["square", "spark", "big", "dot", "star", "ribbon", "trail", ""];
+      const shapes = ["square", "spark", "big", "dot", "star", "ribbon", "trail", "giant", "hexa", "wing", ""];
       const bursts = [
-        { count: 84, spread: 1, radius: 280, delay: 0, life: 1500 },
-        { count: 96, spread: 1.4, radius: 420, delay: 100, life: 1700 },
-        { count: 132, spread: 1.85, radius: 620, delay: 220, life: 1900 }
+        { count: 220, spread: 1.35, radius: 420, delay: 0, life: 2200 },
+        { count: 280, spread: 1.7, radius: 620, delay: 90, life: 2500 },
+        { count: 360, spread: 2.1, radius: 900, delay: 210, life: 2850 },
+        { count: 420, spread: 2.45, radius: 1180, delay: 360, life: 3200 },
+        { count: 500, spread: 2.75, radius: 1460, delay: 560, life: 3600 }
       ];
 
       layer.innerHTML = "";
@@ -2263,13 +2298,13 @@
           for (let i = 0; i < burst.count; i += 1) {
             const piece = document.createElement("span");
             const color = palette[Math.floor(Math.random() * palette.length)];
-            const angle = (Math.PI * 2 * i) / burst.count + (Math.random() - 0.5) * 0.55;
-            const distance = burst.radius * (0.5 + Math.random() * burst.spread);
-            const x = `${Math.round(Math.cos(angle) * distance + (Math.random() - 0.5) * 180)}px`;
-            const y = `${Math.round(Math.sin(angle) * distance + (Math.random() - 0.5) * 180)}px`;
-            const rotation = `${Math.round(720 + Math.random() * 1440)}deg`;
-            const delay = `${Math.random() * 220}ms`;
-            const sizeScale = 0.7 + Math.random() * 1.8;
+            const angle = (Math.PI * 2 * i) / burst.count + (Math.random() - 0.5) * 1.2;
+            const distance = burst.radius * (0.55 + Math.random() * burst.spread);
+            const x = `${Math.round(Math.cos(angle) * distance + (Math.random() - 0.5) * 360)}px`;
+            const y = `${Math.round(Math.sin(angle) * distance + (Math.random() - 0.5) * 360)}px`;
+            const rotation = `${Math.round(1440 + Math.random() * 2880)}deg`;
+            const delay = `${Math.random() * 520}ms`;
+            const sizeScale = 1 + Math.random() * 4.2;
             const shape = shapes[Math.floor(Math.random() * shapes.length)];
 
             piece.className = `confetti-piece ${shape}`.trim();
@@ -2290,7 +2325,7 @@
 
       window.setTimeout(() => {
         layer?.remove();
-      }, 2300);
+      }, 4200);
     }
 
     function flashResultBoard() {
@@ -2342,12 +2377,15 @@
       renderChips(finalNumbers, currentResult);
       renderHistory();
       flashResultBoard();
-      launchConfetti();
       triggerDrawFrenzy("end");
-      window.setTimeout(() => launchConfetti(), 120);
+      launchConfetti();
+      window.setTimeout(() => launchConfetti(), 140);
       window.setTimeout(() => triggerDrawFrenzy("end"), 220);
       window.setTimeout(() => launchConfetti(), 360);
-      window.setTimeout(() => triggerDrawFrenzy("end"), 520);
+      window.setTimeout(() => launchConfetti(), 580);
+      window.setTimeout(() => triggerDrawFrenzy("end"), 720);
+      window.setTimeout(() => launchConfetti(), 900);
+      window.setTimeout(() => launchConfetti(), 1180);
 
       if (supabase) {
         setDbStatus("Supabase에 추첨 결과를 저장하는 중입니다...");
