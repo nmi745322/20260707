@@ -71,6 +71,44 @@
       overflow-x: hidden;
     }
 
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      inset: auto;
+      pointer-events: none;
+      z-index: 0;
+      border-radius: 50%;
+      filter: blur(24px);
+      opacity: 0.42;
+      animation: drift 18s ease-in-out infinite alternate;
+    }
+
+    body::before {
+      top: -80px;
+      right: -120px;
+      width: 320px;
+      height: 320px;
+      background: radial-gradient(circle, rgba(218, 41, 28, 0.22), transparent 68%);
+    }
+
+    body::after {
+      bottom: -120px;
+      left: -80px;
+      width: 260px;
+      height: 260px;
+      background: radial-gradient(circle, rgba(246, 229, 0, 0.16), transparent 68%);
+      animation-duration: 24s;
+      animation-direction: alternate-reverse;
+    }
+
+    main,
+    header,
+    footer {
+      position: relative;
+      z-index: 1;
+    }
+
     a {
       color: inherit;
       text-decoration: none;
@@ -141,9 +179,23 @@
     .hero-band {
       background:
         radial-gradient(circle at 20% 20%, rgba(218, 41, 28, 0.22), transparent 30%),
+        radial-gradient(circle at 80% 30%, rgba(246, 229, 0, 0.14), transparent 24%),
         linear-gradient(135deg, #111111 0%, #181818 50%, #0d0d0d 100%);
       color: var(--ink);
       border-bottom: 1px solid var(--hairline);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-band::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(120deg, transparent 20%, rgba(255, 255, 255, 0.06) 50%, transparent 80%);
+      transform: translateX(-60%);
+      animation: sweep 9s ease-in-out infinite;
+      pointer-events: none;
     }
 
     .draw-band,
@@ -546,14 +598,18 @@
       font-size: 20px;
       font-weight: 700;
       opacity: 0.55;
-      transition: transform 160ms ease, background-color 160ms ease, opacity 160ms ease;
+      transition: transform 160ms ease, background-color 160ms ease, opacity 160ms ease, box-shadow 160ms ease;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
     }
 
     .ball.active {
       opacity: 1;
       background: var(--primary);
       border-color: var(--primary);
-      transform: translateY(-2px);
+      transform: translateY(-2px) scale(1.06);
+      box-shadow:
+        0 0 24px rgba(218, 41, 28, 0.45),
+        0 0 48px rgba(218, 41, 28, 0.16);
     }
 
     .section-block {
@@ -656,6 +712,7 @@
       background: var(--surface-soft-light);
       color: var(--body-on-light);
       border-color: var(--hairline-on-light);
+      overflow: hidden;
     }
 
     .result-row {
@@ -676,6 +733,8 @@
       border: 1px solid var(--primary);
       font-size: 18px;
       font-weight: 700;
+      box-shadow: 0 8px 18px rgba(218, 41, 28, 0.22);
+      animation: chipPop 320ms ease-out;
     }
 
     .result-meta {
@@ -688,6 +747,124 @@
 
     .result-meta strong {
       color: var(--body-on-light);
+    }
+
+    .result-board.drawing {
+      animation: boardPulse 420ms ease-out;
+      box-shadow:
+        0 0 0 1px rgba(218, 41, 28, 0.22),
+        0 18px 40px rgba(0, 0, 0, 0.08);
+    }
+
+    .result-board.is-complete {
+      animation: boardFlash 760ms ease-out;
+    }
+
+    .confetti-layer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 9999;
+    }
+
+    .confetti-piece {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 10px;
+      height: 16px;
+      border-radius: 999px;
+      opacity: 0;
+      transform: translate(-50%, -50%) rotate(0deg);
+      animation: confettiFly 900ms cubic-bezier(0.12, 0.85, 0.18, 1) forwards;
+      box-shadow: 0 0 12px currentColor;
+    }
+
+    .confetti-piece.square {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+    }
+
+    .confetti-piece.spark {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+
+    @keyframes sweep {
+      0% {
+        transform: translateX(-70%);
+        opacity: 0;
+      }
+      20% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.8;
+      }
+      100% {
+        transform: translateX(70%);
+        opacity: 0;
+      }
+    }
+
+    @keyframes drift {
+      0% {
+        transform: translate3d(0, 0, 0) scale(1);
+      }
+      100% {
+        transform: translate3d(-18px, 24px, 0) scale(1.08);
+      }
+    }
+
+    @keyframes chipPop {
+      from {
+        transform: scale(0.72);
+        filter: saturate(1.1);
+      }
+      to {
+        transform: scale(1);
+      }
+    }
+
+    @keyframes boardPulse {
+      0% {
+        transform: scale(0.98);
+      }
+      60% {
+        transform: scale(1.01);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    @keyframes boardFlash {
+      0% {
+        box-shadow: 0 0 0 0 rgba(218, 41, 28, 0.3);
+      }
+      35% {
+        box-shadow: 0 0 0 12px rgba(218, 41, 28, 0.08);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(218, 41, 28, 0);
+      }
+    }
+
+    @keyframes confettiFly {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.6) rotate(0deg);
+      }
+      10% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+        transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) scale(1.05) rotate(var(--r));
+      }
     }
 
     .db-status {
@@ -1551,6 +1728,52 @@
       archiveStatus.textContent = `공식 최근 회차 1231 포함 ${OFFICIAL_ARCHIVE.length}개의 최신 결과를 보여줍니다.`;
     }
 
+    function launchConfetti() {
+      let layer = document.querySelector(".confetti-layer");
+      if (!layer) {
+        layer = document.createElement("div");
+        layer.className = "confetti-layer";
+        document.body.appendChild(layer);
+      }
+
+      const palette = ["#da291c", "#f6e500", "#ffffff", "#ff6b3d", "#ffd166"];
+      const shapes = ["square", "spark", ""];
+      const pieces = 28;
+
+      layer.innerHTML = "";
+
+      for (let i = 0; i < pieces; i += 1) {
+        const piece = document.createElement("span");
+        const color = palette[i % palette.length];
+        const x = `${Math.round((Math.random() * 2 - 1) * 260)}px`;
+        const y = `${Math.round(-180 - Math.random() * 360)}px`;
+        const rotation = `${Math.round(360 + Math.random() * 720)}deg`;
+        const delay = `${Math.random() * 140}ms`;
+
+        piece.className = `confetti-piece ${shapes[i % shapes.length]}`.trim();
+        piece.style.background = color;
+        piece.style.color = color;
+        piece.style.setProperty("--x", x);
+        piece.style.setProperty("--y", y);
+        piece.style.setProperty("--r", rotation);
+        piece.style.animationDelay = delay;
+        layer.appendChild(piece);
+      }
+
+      window.setTimeout(() => {
+        layer?.remove();
+      }, 1100);
+    }
+
+    function flashResultBoard() {
+      resultBoard.classList.remove("is-complete");
+      void resultBoard.offsetWidth;
+      resultBoard.classList.add("is-complete");
+      window.setTimeout(() => {
+        resultBoard.classList.remove("is-complete");
+      }, 800);
+    }
+
     async function drawLottery() {
       if (isDrawing) return;
 
@@ -1585,9 +1808,11 @@
       lastDrawAt.textContent = formatTime(now);
       renderChips(finalNumbers, currentResult);
       renderHistory();
+      flashResultBoard();
+      launchConfetti();
 
       if (supabase) {
-        setDbStatus("Supabase에서 저장된 추첨 기록을 불러오는 중입니다...");
+        setDbStatus("Supabase에 추첨 결과를 저장하는 중입니다...");
 
         try {
           const savedRow = await saveDrawResult(finalNumbers, now);
@@ -1596,7 +1821,7 @@
             lastDrawAt.textContent = savedRow.time;
             renderHistory();
           }
-          setDbStatus("Supabase에서 저장된 추첨 기록을 불러오는 중입니다...");
+          setDbStatus("Supabase에 추첨 결과를 저장했습니다.", "ready");
         } catch (error) {
           setDbStatus(`저장 실패: ${error.message}`, "warning");
         }
