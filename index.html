@@ -79,6 +79,10 @@
       overflow-x: hidden;
     }
 
+    body.is-drawing-frenzy {
+      animation: megaShake 120ms linear infinite, megaHue 900ms linear infinite;
+    }
+
     body::before,
     body::after {
       content: "";
@@ -115,6 +119,115 @@
     footer {
       position: relative;
       z-index: 1;
+    }
+
+    .draw-fx-layer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9998;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .draw-fx-flash,
+    .draw-fx-rings,
+    .draw-fx-rays,
+    .draw-fx-particles {
+      position: absolute;
+      inset: 0;
+    }
+
+    .draw-fx-flash {
+      background:
+        radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.28) 16%, rgba(255, 255, 255, 0) 42%),
+        radial-gradient(circle at 50% 50%, rgba(246, 229, 0, 0.85), rgba(246, 229, 0, 0) 48%);
+      opacity: 0;
+      animation: megaFlash 900ms ease-out forwards;
+      mix-blend-mode: screen;
+    }
+
+    .draw-fx-rings::before,
+    .draw-fx-rings::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 120vmax;
+      height: 120vmax;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.36);
+      transform: translate(-50%, -50%) scale(0.2);
+      opacity: 0;
+      animation: megaRing 1200ms ease-out forwards;
+      box-shadow:
+        0 0 40px rgba(218, 41, 28, 0.22),
+        inset 0 0 36px rgba(255, 255, 255, 0.08);
+    }
+
+    .draw-fx-rings::after {
+      width: 86vmax;
+      height: 86vmax;
+      border-color: rgba(246, 229, 0, 0.4);
+      animation-delay: 110ms;
+    }
+
+    .draw-fx-rays {
+      opacity: 0;
+      animation: megaRays 1100ms ease-out forwards;
+      background:
+        conic-gradient(from 0deg at 50% 50%,
+          rgba(255, 255, 255, 0) 0deg,
+          rgba(255, 255, 255, 0.14) 8deg,
+          rgba(255, 255, 255, 0) 16deg,
+          rgba(218, 41, 28, 0.18) 24deg,
+          rgba(255, 255, 255, 0) 32deg,
+          rgba(246, 229, 0, 0.12) 40deg,
+          rgba(255, 255, 255, 0) 48deg,
+          rgba(255, 255, 255, 0) 360deg);
+      transform-origin: center;
+      filter: blur(0.5px);
+      mix-blend-mode: screen;
+    }
+
+    .draw-fx-particles {
+      filter: drop-shadow(0 0 10px currentColor);
+    }
+
+    .draw-fx-particle {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      opacity: 0;
+      transform: translate(-50%, -50%);
+      animation: megaParticle 1100ms cubic-bezier(0.1, 0.72, 0.18, 1) forwards;
+      box-shadow: 0 0 16px currentColor;
+    }
+
+    .draw-fx-particle.wide {
+      width: 18px;
+      height: 6px;
+      border-radius: 999px;
+    }
+
+    .draw-fx-particle.square {
+      border-radius: 2px;
+    }
+
+    .draw-fx-particle.spark {
+      width: 5px;
+      height: 18px;
+      border-radius: 999px;
+    }
+
+    .draw-fx-particle.glow {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      filter: blur(1px);
     }
 
     a {
@@ -203,6 +316,17 @@
         linear-gradient(120deg, transparent 20%, rgba(255, 255, 255, 0.06) 50%, transparent 80%);
       transform: translateX(-60%);
       animation: sweep 9s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    .hero-band::before {
+      content: "";
+      position: absolute;
+      inset: -20% -10%;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(246, 229, 0, 0.08), transparent 38%),
+        radial-gradient(circle at 30% 70%, rgba(218, 41, 28, 0.16), transparent 24%);
+      animation: slowPulse 12s ease-in-out infinite alternate;
       pointer-events: none;
     }
 
@@ -768,6 +892,14 @@
       animation: boardFlash 760ms ease-out;
     }
 
+    .result-board.is-frenzy {
+      animation: boardRattle 160ms linear infinite;
+      box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.12),
+        0 0 52px rgba(218, 41, 28, 0.22),
+        0 0 84px rgba(246, 229, 0, 0.12);
+    }
+
     .confetti-layer {
       position: fixed;
       inset: 0;
@@ -818,6 +950,17 @@
       }
     }
 
+    @keyframes slowPulse {
+      from {
+        transform: scale(1);
+        opacity: 0.45;
+      }
+      to {
+        transform: scale(1.08);
+        opacity: 0.9;
+      }
+    }
+
     @keyframes drift {
       0% {
         transform: translate3d(0, 0, 0) scale(1);
@@ -858,6 +1001,65 @@
       }
       100% {
         box-shadow: 0 0 0 0 rgba(218, 41, 28, 0);
+      }
+    }
+
+    @keyframes boardRattle {
+      0% { transform: translate3d(0, 0, 0) rotate(0deg); }
+      25% { transform: translate3d(-2px, 1px, 0) rotate(-0.3deg); }
+      50% { transform: translate3d(2px, -1px, 0) rotate(0.4deg); }
+      75% { transform: translate3d(-1px, -2px, 0) rotate(-0.2deg); }
+      100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+    }
+
+    @keyframes megaShake {
+      0% { transform: translate3d(0, 0, 0) rotate(0deg); }
+      20% { transform: translate3d(-2px, 1px, 0) rotate(-0.2deg); }
+      40% { transform: translate3d(2px, -1px, 0) rotate(0.2deg); }
+      60% { transform: translate3d(-1px, 2px, 0) rotate(-0.15deg); }
+      80% { transform: translate3d(1px, -2px, 0) rotate(0.12deg); }
+      100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+    }
+
+    @keyframes megaHue {
+      0% { filter: hue-rotate(0deg) saturate(1); }
+      50% { filter: hue-rotate(12deg) saturate(1.45); }
+      100% { filter: hue-rotate(0deg) saturate(1); }
+    }
+
+    @keyframes megaFlash {
+      0% { opacity: 0; transform: scale(0.65); }
+      12% { opacity: 1; }
+      45% { opacity: 0.72; transform: scale(1.04); }
+      100% { opacity: 0; transform: scale(1.14); }
+    }
+
+    @keyframes megaRing {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(0.18); }
+      18% { opacity: 0.95; }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(1.02); }
+    }
+
+    @keyframes megaRays {
+      0% { opacity: 0; transform: rotate(-25deg) scale(0.62); }
+      20% { opacity: 0.8; }
+      100% { opacity: 0; transform: rotate(220deg) scale(1.12); }
+    }
+
+    @keyframes megaParticle {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.4) rotate(0deg);
+      }
+      8% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+        transform:
+          translate(calc(-50% + var(--x)), calc(-50% + var(--y)))
+          scale(1.1)
+          rotate(var(--r));
       }
     }
 
@@ -1745,6 +1947,71 @@
       }
     }
 
+    function createDrawFxLayer() {
+      let layer = document.querySelector(".draw-fx-layer");
+      if (!layer) {
+        layer = document.createElement("div");
+        layer.className = "draw-fx-layer";
+        layer.innerHTML = `
+          <div class="draw-fx-flash"></div>
+          <div class="draw-fx-rings"></div>
+          <div class="draw-fx-rays"></div>
+          <div class="draw-fx-particles"></div>
+        `;
+        document.body.appendChild(layer);
+      }
+
+      return layer;
+    }
+
+    function triggerDrawFrenzy(mode = "end") {
+      const layer = createDrawFxLayer();
+      const particles = layer.querySelector(".draw-fx-particles");
+      const flash = layer.querySelector(".draw-fx-flash");
+      const rings = layer.querySelector(".draw-fx-rings");
+      const rays = layer.querySelector(".draw-fx-rays");
+
+      document.body.classList.add("is-drawing-frenzy");
+      resultBoard.classList.add("is-frenzy");
+
+      const palette = ["#ffffff", "#f6e500", "#da291c", "#ff6b3d", "#ffd166"];
+      const shapeClasses = ["", "wide", "square", "spark", "glow"];
+      const particleCount = mode === "start" ? 24 : 96;
+
+      particles.innerHTML = "";
+      void flash.offsetWidth;
+      void rings.offsetWidth;
+      void rays.offsetWidth;
+
+      for (let i = 0; i < particleCount; i += 1) {
+        const particle = document.createElement("span");
+        const angle = (Math.PI * 2 * i) / particleCount + Math.random() * 0.35;
+        const distance = mode === "start"
+          ? 120 + Math.random() * 180
+          : 260 + Math.random() * 520;
+        const wobbleX = Math.cos(angle) * distance + (Math.random() - 0.5) * 90;
+        const wobbleY = Math.sin(angle) * distance + (Math.random() - 0.5) * 90;
+        const rotation = `${Math.round(360 + Math.random() * 1080)}deg`;
+        const delay = `${Math.random() * (mode === "start" ? 90 : 180)}ms`;
+        const color = palette[i % palette.length];
+
+        particle.className = `draw-fx-particle ${shapeClasses[i % shapeClasses.length]}`.trim();
+        particle.style.background = color;
+        particle.style.color = color;
+        particle.style.setProperty("--x", `${Math.round(wobbleX)}px`);
+        particle.style.setProperty("--y", `${Math.round(wobbleY)}px`);
+        particle.style.setProperty("--r", rotation);
+        particle.style.animationDelay = delay;
+        particles.appendChild(particle);
+      }
+
+      window.setTimeout(() => {
+        document.body.classList.remove("is-drawing-frenzy");
+        resultBoard.classList.remove("is-frenzy");
+        layer.remove();
+      }, mode === "start" ? 900 : 1300);
+    }
+
     function launchConfetti() {
       let layer = document.querySelector(".confetti-layer");
       if (!layer) {
@@ -1803,6 +2070,7 @@
         button_id: "drawBtn",
         button_text: "추첨하기"
       });
+      triggerDrawFrenzy("start");
 
       const steps = 6;
       let finalNumbers = [];
@@ -1831,6 +2099,7 @@
       renderHistory();
       flashResultBoard();
       launchConfetti();
+      triggerDrawFrenzy("end");
 
       if (supabase) {
         setDbStatus("Supabase에 추첨 결과를 저장하는 중입니다...");
