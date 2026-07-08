@@ -1736,6 +1736,15 @@
       archiveStatus.textContent = `공식 최근 회차 1231 포함 ${OFFICIAL_ARCHIVE.length}개의 최신 결과를 보여줍니다.`;
     }
 
+    function trackLottoEvent(eventName, params = {}) {
+      if (typeof window.gtag === "function") {
+        window.gtag("event", eventName, {
+          event_category: "lotto",
+          ...params
+        });
+      }
+    }
+
     function launchConfetti() {
       let layer = document.querySelector(".confetti-layer");
       if (!layer) {
@@ -1790,6 +1799,10 @@
       clearBtn.disabled = true;
       drawAgainBtn.disabled = true;
       resultBoard.classList.add("drawing");
+      trackLottoEvent("lotto_draw_click", {
+        button_id: "drawBtn",
+        button_text: "추첨하기"
+      });
 
       const steps = 6;
       let finalNumbers = [];
